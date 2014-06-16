@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-OTR
   homepage: http://search.cpan.org/dist/Protocol-OTR
   repository: git://github.com/ajgb/protocol-otr.git
-version: '0.01'
+version: '0.02'
 x_Dist_Zilla:
   perl:
     version: '5.018002'

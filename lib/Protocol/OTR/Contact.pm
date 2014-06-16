@@ -3,7 +3,7 @@ package Protocol::OTR::Contact;
 BEGIN {
   $Protocol::OTR::Contact::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Contact::VERSION = '0.01';
+$Protocol::OTR::Contact::VERSION = '0.02';
 use strict;
 use warnings;
 use Protocol::OTR ();
@@ -140,7 +140,7 @@ Protocol::OTR::Contact - Off-the-Record secure messaging protocol
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

@@ -8,6 +8,7 @@ META.yml
 Makefile.PL
 OTR.xs
 README
+examples/xmpp-otr.pl
 lib/Protocol/OTR.pm
 lib/Protocol/OTR/Account.pm
 lib/Protocol/OTR/Channel.pm

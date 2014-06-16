@@ -3,7 +3,7 @@ package Protocol::OTR::Fingerprint;
 BEGIN {
   $Protocol::OTR::Fingerprint::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Fingerprint::VERSION = '0.01';
+$Protocol::OTR::Fingerprint::VERSION = '0.02';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Protocol::OTR::Fingerprint - Off-the-Record secure messaging protocol
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

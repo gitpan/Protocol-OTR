@@ -1196,8 +1196,6 @@ DESTROY(self)
     Protocol::OTR self
     CODE:
     {
-        printf("OTR->DESTROY\n");
-
         if ( self->userstate ) {
             otrl_userstate_free(self->userstate);
             self->userstate = NULL;
@@ -1385,11 +1383,8 @@ _fingerprints(contact)
                     TrustLevel this_level = TRUST_NOT_PRIVATE;
 
                     if (context_iter->active_fingerprint == fingerprint) {
-                        //printf("found active_fingerprint: %p == %p\n", context_iter->active_fingerprint, fingerprint);
                         this_level = otrp_plugin_context_to_trust(context_iter);
                         used = 1;
-
-                        //printf("this_level = %d\n", this_level);
 
                         if (this_level == TRUST_PRIVATE) {
                             best_level = TRUST_PRIVATE;
