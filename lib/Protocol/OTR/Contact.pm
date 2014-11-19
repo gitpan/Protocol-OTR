@@ -1,9 +1,9 @@
-# ABSTRACT: Off-the-Record secure messaging protocol
+# ABSTRACT: Off-the-Record Contact
 package Protocol::OTR::Contact;
 BEGIN {
   $Protocol::OTR::Contact::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Contact::VERSION = '0.02';
+$Protocol::OTR::Contact::VERSION = '0.03';
 use strict;
 use warnings;
 use Protocol::OTR ();
@@ -136,11 +136,11 @@ __END__
 
 =head1 NAME
 
-Protocol::OTR::Contact - Off-the-Record secure messaging protocol
+Protocol::OTR::Contact - Off-the-Record Contact
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

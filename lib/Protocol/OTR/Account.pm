@@ -1,9 +1,9 @@
-# ABSTRACT: Off-the-Record secure messaging protocol
+# ABSTRACT: Off-the-Record Account (private key)
 package Protocol::OTR::Account;
 BEGIN {
   $Protocol::OTR::Account::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Account::VERSION = '0.02';
+$Protocol::OTR::Account::VERSION = '0.03';
 use strict;
 use warnings;
 use Protocol::OTR::Contact ();
@@ -86,11 +86,11 @@ __END__
 
 =head1 NAME
 
-Protocol::OTR::Account - Off-the-Record secure messaging protocol
+Protocol::OTR::Account - Off-the-Record Account (private key)
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

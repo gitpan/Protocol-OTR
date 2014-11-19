@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Alien::OTR" : "v4.0.0.1"
+            "Alien::OTR" : "v4.1.0.0"
          }
       },
       "develop" : {
@@ -64,7 +64,7 @@
          "web" : "https://github.com/ajgb/protocol-otr"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018002"

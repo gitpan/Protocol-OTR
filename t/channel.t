@@ -19,7 +19,6 @@ my %RWHANDLERS;
 my @Q;
 
 my $SMP_QUESTION = "W Paryżu najlepsze kasztany są na placu Pigalle";
-my $SMP_ANSWER;
 my $SMP_WRONG_ANSWER = "Na placu Pigalle najlepsze są nie kasztany, ale burdele";
 my $SMP_CORRECT_ANSWER = "Zuzanna lubi je tylko jesienią.";
 
@@ -198,8 +197,6 @@ my %common_handlers = (
         $FLAGS{$slot}->{on_smp} = {
             question => $question,
         };
-
-        return $SMP_CORRECT_ANSWER;
     },
     on_write => sub {
         my ($c, $message) = @_;
@@ -243,6 +240,9 @@ $RWHANDLERS{bob2alice}->{on_write} = sub {
     };
 };
 
+is($channel_alice2bob->status, "Not private", "Status of Alice's channel to Bob is Not private");
+is($channel_bob2alice->status, "Not private", "Status of Bob's channel to Alice is Not private");
+
 send_messages(
     sub {
         $channel_alice2bob->init();
@@ -251,6 +251,11 @@ send_messages(
 
 is($FLAGS{alice2bob}->{on_gone_secure}, 1, "Alice's channel is secure");
 is($FLAGS{bob2alice}->{on_gone_secure}, 1, "Bob's channel is secure");
+
+is($channel_alice2bob->status, "Unverified", "Status of Alice's channel to Bob is Unverified");
+is($channel_alice2bob->contact->active_fingerprint->status, "Unverified", "...and so is active fingerprint");
+is($channel_bob2alice->status, "Unverified", "Status of Bob's channel to Alice is Unverified");
+is($channel_bob2alice->contact->active_fingerprint->status, "Unverified", "...and so is active fingerprint");
 
 is($FLAGS{alice2bob}->{on_unverified_fingerprint}->{hash}, $bob->fingerprint, "Alice's learnt Bob's fingerprint");
 is($FLAGS{alice2bob}->{on_unverified_fingerprint}->{seen_before}, 1, "...that was seen before");
@@ -298,6 +303,9 @@ is($FLAGS{alice2bob}->{on_gone_insecure}, 1, "Alice's channel gone insecure");
 is($FLAGS{alice2bob}->{on_event}->{code}, MSGEVENT_LOG_HEARTBEAT_RCVD, "Alice's channel received MSGEVENT_LOG_HEARTBEAT_RCVD ");
 is($FLAGS{bob2alice}->{on_is_contact_logged_in}, 1, "Bob's checked if Alice is online");
 
+is($channel_alice2bob->status, "Finished", "Status of Alice's channel to Bob is Finished");
+is($channel_bob2alice->status, "Not private", "Status of Bob's channel to Alice is Not private");
+
 %FLAGS = ();
 
 send_messages(
@@ -335,31 +343,45 @@ is($FLAGS{alice2bob}->{on_after_decrypt}->{message}, scalar reverse($msg_b2a), "
 
 %FLAGS = ();
 
-$SMP_ANSWER = $SMP_WRONG_ANSWER;
-
 send_messages(
     sub {
-        $channel_bob2alice->smp_verify( $SMP_ANSWER, $SMP_QUESTION );
+        $channel_bob2alice->smp_verify( $SMP_CORRECT_ANSWER, $SMP_QUESTION );
     }
 );
 
-is($FLAGS{alice2bob}->{on_smp}->{question}, $SMP_QUESTION, "Alice's channel received SMP question, but the impostor doesn't know the answer");
+is($FLAGS{alice2bob}->{on_smp}->{question}, $SMP_QUESTION, "Alice's channel received SMP question, but she doesn't know the answer");
+
+send_messages(
+    sub {
+        $channel_alice2bob->smp_respond( $SMP_WRONG_ANSWER );
+    }
+);
 is($FLAGS{bob2alice}->{on_smp_event}->{code}, SMPEVENT_FAILURE, "...so Bob's channel received SMPEVENT_FAILURE ");
-is($FLAGS{alice2bob}->{on_smp_event}->{code}, SMPEVENT_FAILURE, "...and Alice's channel received SMPEVENT_FAILURE");
+is($FLAGS{alice2bob}->{on_smp_event}->{code}, SMPEVENT_FAILURE, "...and so did Alice's channel");
 
 %FLAGS = ();
 
-$SMP_ANSWER = $SMP_CORRECT_ANSWER;
-
 send_messages(
     sub {
-        $channel_bob2alice->smp_verify( $SMP_ANSWER, $SMP_QUESTION );
+        $channel_bob2alice->smp_verify( $SMP_CORRECT_ANSWER );
     }
 );
 
-is($FLAGS{alice2bob}->{on_smp}->{question}, $SMP_QUESTION, "Alice's channel received SMP question, and this time it is Alice");
+is($FLAGS{alice2bob}->{on_smp}->{question}, undef, "Alice's channel received SMP request, no hint given, but it is the right Alice");
+
+send_messages(
+    sub {
+        $channel_alice2bob->smp_respond( $SMP_CORRECT_ANSWER );
+    }
+);
 is($FLAGS{bob2alice}->{on_smp_event}->{code}, SMPEVENT_SUCCESS, "...so Bob's channel received SMPEVENT_SUCCESS ");
-is($FLAGS{alice2bob}->{on_smp_event}->{code}, SMPEVENT_SUCCESS, "...and so does Alice's channel");
+is($FLAGS{alice2bob}->{on_smp_event}->{code}, SMPEVENT_SUCCESS, "...and so did Alice's channel");
+
+is($channel_alice2bob->status, "Private", "Status of Alice's channel to Bob is Private");
+is($channel_alice2bob->contact->active_fingerprint->status, "Private", "...and so is active fingerprint");
+is($channel_bob2alice->status, "Private", "Status of Bob's channel to Alice is Private");
+is($channel_bob2alice->contact->active_fingerprint->status, "Private", "...and so is active fingerprint");
+
 
 %FLAGS = ();
 

@@ -10,7 +10,7 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  Alien::OTR: v4.0.0.1
+  Alien::OTR: v4.1.0.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
 license: perl
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-OTR
   homepage: http://search.cpan.org/dist/Protocol-OTR
   repository: git://github.com/ajgb/protocol-otr.git
-version: '0.02'
+version: '0.03'
 x_Dist_Zilla:
   perl:
     version: '5.018002'

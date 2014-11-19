@@ -79,9 +79,9 @@ $cl->reg_cb(
                     on_smp => sub {
                         my ($c, $q) = @_;
 
-                        warn "SMP response sent\n";
+                        $c->smp_respond(scalar reverse $q);
 
-                        return scalar reverse $q;
+                        warn "SMP response sent\n";
                     }
                 }
             );

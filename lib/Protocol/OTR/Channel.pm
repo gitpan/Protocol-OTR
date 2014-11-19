@@ -1,9 +1,9 @@
-# ABSTRACT: Off-the-Record secure messaging protocol
+# ABSTRACT: Off-the-Record communication Channel
 package Protocol::OTR::Channel;
 BEGIN {
   $Protocol::OTR::Channel::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Channel::VERSION = '0.02';
+$Protocol::OTR::Channel::VERSION = '0.03';
 use strict;
 use warnings;
 use Scalar::Util ();
@@ -50,11 +50,11 @@ __END__
 
 =head1 NAME
 
-Protocol::OTR::Channel - Off-the-Record secure messaging protocol
+Protocol::OTR::Channel - Off-the-Record communication Channel
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ version 0.02
 
 =head1 DESCRIPTION
 
-L<Protocol::OTR::Contact> represents the OTR contact.
+L<Protocol::OTR::Channel> represents the OTR communication channel.
 
 =head1 METHODS
 
@@ -138,6 +138,26 @@ Refreshes current authentication keys.
     $channel->finish();
 
 Finish all sessions within the channel.
+
+=head2 status
+
+    print $channel->status();
+
+Returns current status of the channel, which is one of:
+
+=over 4
+
+=item * Unused
+
+=item * Not private
+
+=item * Unverified
+
+=item * Private
+
+=item * Finished
+
+=back
 
 =head2 create_symkey
 
@@ -186,6 +206,18 @@ See L</on_timer> for more details.
 Verify identity of the contact using Socialist Millionaires' Protocol (SMP).
 Contact is required to respond with the expected C<$answer>, optional
 C<$question> may be provided.
+
+=head2 smp_respond
+
+    sub display_smp_popup {
+        my ($channel, $question) = @_;
+
+        my $answer = get_answer($question);
+
+        $channel->smp_respond( $answer );
+    }
+
+Respond to SMP identity verification question with expected secret/answer.
 
 =head2 smp_abort
 
@@ -310,12 +342,11 @@ Following defaults are used based on the protocol:
         }
     );
 
-Send given message to contact - it will be encrypted and split if neccessary.
-This callback is required.
+Receives encrypted message to be sent. This callback is required.
 
 C<$c> is a reference to the current channel.
 
-C<$message> is the message to be sent.
+C<$message> is the encrypted message to be sent.
 
 =head2 on_read
 
@@ -514,14 +545,13 @@ C<$interval> is described above.
                 print "SMP verification in channel between ", $c->contact->name,
                       " and ", $c->account->name, "\n";
 
-                return handle_smp( $question );
+                display_smp_popup( $c, $question );
             },
             ...
         }
     );
 
-Called when received SMP verification. Return the expected answer to confirm
-your identity.
+Called when received SMP verification. Use to retrieve the answer.
 
 C<$c> is a reference to the current channel.
 

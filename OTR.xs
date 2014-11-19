@@ -610,9 +610,8 @@ static OtrlMessageAppOps callbacks = {
     timer_control_cb 
 };
 
-static void smp_event_respond(SV *channel, ConnContext *context, char *question)
+static void smp_event_popup(SV *channel, ConnContext *context, char *question)
 {
-    unsigned char * answer;
     int count;
     OTRctx * ctx = CHANNEL2CTX(channel);
     dSP;
@@ -624,27 +623,15 @@ static void smp_event_respond(SV *channel, ConnContext *context, char *question)
 
     XPUSHs( channel );
     XPUSHs( sv_2mortal( newSVpvn( "on_smp", 6 )));
-    XPUSHs( sv_2mortal( newSVpv( question, 0 )));
-    PUTBACK;
-
-    count = call_method( "_ev", G_SCALAR );
-
-    if ( count != 1 ) {
-        croak("on_smp() callback did not return shared answer");
+    if ( question != NULL ) {
+        XPUSHs( sv_2mortal( newSVpv( question, 0 )));
     }
-
-    SPAGAIN;
-
-    answer = (unsigned char*)savepv( (char*)POPp );
-
     PUTBACK;
+
+    call_method( "_ev", G_DISCARD | G_VOID );
+
     FREETMPS;
     LEAVE;
-
-    otrl_message_respond_smp(ctx->userstate, &callbacks, channel,
-	    context, answer, strlen((char*)answer));
-
-    Safefree(answer);
 }
 
 static void handle_smp_event_cb(void *opdata, OtrlSMPEvent smp_event, ConnContext *context,
@@ -665,10 +652,10 @@ static void handle_smp_event_cb(void *opdata, OtrlSMPEvent smp_event, ConnContex
             smp_event_cb(channel, smp_event, progress_percent);
             break;
         case OTRL_SMPEVENT_ASK_FOR_SECRET :
-            smp_event_respond( channel, context, question);
+            smp_event_popup( channel, context, NULL);
             break;
         case OTRL_SMPEVENT_ASK_FOR_ANSWER :
-            smp_event_respond( channel, context, question);
+            smp_event_popup( channel, context, question);
             break;
         case OTRL_SMPEVENT_CHEATED :
             otrl_message_abort_smp(
@@ -1744,8 +1731,8 @@ smp_verify(channel, answer, ...)
         ctx = CHANNEL2CTX(channel);
 
         contact_name = SvPV_nolen(HASHGET(contact, "name", 4));
-        account_name = SvPV_nolen(HASHGET(account, "name", 4)); 
-        account_protocol = SvPV_nolen(HASHGET(account, "protocol", 8)); 
+        account_name = SvPV_nolen(HASHGET(account, "name", 4));
+        account_protocol = SvPV_nolen(HASHGET(account, "protocol", 8));
 
         context = otrl_context_find(
             ctx->userstate, contact_name, account_name, account_protocol,
@@ -1781,6 +1768,43 @@ smp_verify(channel, answer, ...)
 
         XSRETURN_YES;
     }
+
+void
+smp_respond(channel, response)
+    SV * channel
+    unsigned char *response
+    PROTOTYPE: $$
+    PPCODE:
+    {
+        ConnContext *context;
+        int context_created = 0;
+        OTRctx * ctx;
+        char *contact_name;
+        char * account_name;
+        char * account_protocol;
+
+        HV * contact = (HV*)CHANNEL2CONTACT(channel);
+        HV * account = (HV*)CONTACT2ACCOUNT(contact);
+
+        ctx = CHANNEL2CTX(channel);
+
+        contact_name = SvPV_nolen(HASHGET(contact, "name", 4));
+        account_name = SvPV_nolen(HASHGET(account, "name", 4));
+        account_protocol = SvPV_nolen(HASHGET(account, "protocol", 8));
+
+        context = otrl_context_find(
+            ctx->userstate, contact_name, account_name, account_protocol,
+            SvUV(HASHGET(channel, "selected_instag", 15)), 0, &context_created, NULL, NULL );
+
+
+        if ( ! context ) XSRETURN_NO;
+
+        otrl_message_respond_smp(ctx->userstate, &callbacks, channel,
+            context, response, strlen((char*)response));
+
+        XSRETURN_YES;
+    }
+
 
 void
 smp_abort(channel)
@@ -2033,4 +2057,40 @@ select_session(channel, session)
 
         XSRETURN_NO;
     }
+
+void
+status(channel)
+    SV * channel
+    PROTOTYPE: $ 
+    PREINIT:
+        ConnContext *context;
+        Fingerprint *fingerprint;
+        OTRctx *ctx;
+        char *contact_name;
+        char *account_name;
+        char *account_protocol;
+    PPCODE:
+    {
+        HV * contact = (HV*)CHANNEL2CONTACT(channel);
+        HV * account = (HV*)CONTACT2ACCOUNT(contact);
+        ctx = ACCOUNT2CTX(account);
+
+        contact_name = SvPV_nolen(HASHGET(contact, "name", 4));
+        account_name = SvPV_nolen(HASHGET(account, "name", 4));
+        account_protocol = SvPV_nolen(HASHGET(account, "protocol", 8));
+
+        context = otrl_context_find(
+            ctx->userstate, contact_name, account_name, account_protocol,
+            SvUV(HASHGET(channel, "selected_instag", 15)), 0, NULL, NULL, NULL );
+
+        if (context) {
+            TrustLevel this_level = otrp_plugin_context_to_trust(context);
+
+            XPUSHs( newSVpv( TrustStates[this_level], 0 ) );
+
+            XSRETURN(1);
+        }
+        XSRETURN_UNDEF;
+    }
+
 

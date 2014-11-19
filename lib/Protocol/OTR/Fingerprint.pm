@@ -1,9 +1,9 @@
-# ABSTRACT: Off-the-Record secure messaging protocol
+# ABSTRACT: Off-the-Record contact's Fingerprint
 package Protocol::OTR::Fingerprint;
 BEGIN {
   $Protocol::OTR::Fingerprint::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Fingerprint::VERSION = '0.02';
+$Protocol::OTR::Fingerprint::VERSION = '0.03';
 use strict;
 use warnings;
 
@@ -38,11 +38,11 @@ __END__
 
 =head1 NAME
 
-Protocol::OTR::Fingerprint - Off-the-Record secure messaging protocol
+Protocol::OTR::Fingerprint - Off-the-Record contact's Fingerprint
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
