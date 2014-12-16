@@ -2,7 +2,7 @@ NAME
     Protocol::OTR - Off-the-Record secure messaging protocol
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
         use Protocol::OTR qw( :constants );

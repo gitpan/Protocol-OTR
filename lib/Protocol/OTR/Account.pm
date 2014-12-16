@@ -3,7 +3,7 @@ package Protocol::OTR::Account;
 BEGIN {
   $Protocol::OTR::Account::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::Account::VERSION = '0.03';
+$Protocol::OTR::Account::VERSION = '0.04';
 use strict;
 use warnings;
 use Protocol::OTR::Contact ();
@@ -90,7 +90,7 @@ Protocol::OTR::Account - Off-the-Record Account (private key)
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

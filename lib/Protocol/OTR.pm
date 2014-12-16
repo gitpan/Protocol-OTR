@@ -3,11 +3,13 @@ package Protocol::OTR;
 BEGIN {
   $Protocol::OTR::AUTHORITY = 'cpan:AJGB';
 }
-$Protocol::OTR::VERSION = '0.03';
+$Protocol::OTR::VERSION = '0.04';
 use strict;
 use warnings;
 
 use Alien::OTR;
+use Alien::GCrypt;
+use Alien::GPG::Error;
 use Carp qw( croak );
 use Protocol::OTR::Account ();
 use Params::Validate qw(validate validate_pos SCALAR);
@@ -174,7 +176,7 @@ Protocol::OTR - Off-the-Record secure messaging protocol
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

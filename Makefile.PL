@@ -3,11 +3,12 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 use Alien::OTR;
+use Alien::GCrypt;
+use Alien::GPG::Error;
 
 my $libotr = Alien::OTR->new;
-
-my $cflags = $libotr->cflags;
-my $libs   = $libotr->libs;
+my $libgcrypt = Alien::GCrypt->new;
+my $libgpgerror = Alien::GPG::Error->new;
 
 WriteMakefile(
     NAME              => 'Protocol::OTR',
@@ -17,10 +18,10 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/Protocol/OTR.pm', # retrieve abstract from module
        AUTHOR         => 'Alex J. G. Burzyński <ajgb\@cpan.org>') : ()),
     LICENSE           => 'perl',
-    LIBS              => [$libs], # e.g., '-lm'
-    INC               => "-I. $cflags", # e.g., '-I. -I/usr/include/other'
+    LIBS              => [$libotr->libs, $libgcrypt->libs, $libgpgerror->libs], # e.g., '-lm'
+    INC               => join(' ', "-I.", $libotr->cflags, $libgcrypt->cflags, $libgpgerror->cflags), # e.g., '-I. -I/usr/include/other'
     CONFIGURE_REQUIRES => {
-      'Alien::OTR' => '4.0.0.1',
+      'Alien::OTR' => '4.1.0.0',
     },
     BUILD_REQUIRES    => {
       'ExtUtils::CBuilder' => 0,
