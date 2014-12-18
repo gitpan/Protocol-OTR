@@ -1,5 +1,8 @@
 Revision history for Perl extension Protocol::OTR.
 
+0.05   2014-12-08 10:12:08
+    Fix unit test prereqs
+
 0.04   2014-12-08 05:19:48
     Add paths to libgpg-error and libgcrypt during the compilation.
 
